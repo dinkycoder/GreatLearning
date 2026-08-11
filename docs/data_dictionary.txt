@@ -1,0 +1,167 @@
+================================================================================
+DATA DICTIONARY & DATA-SUFFICIENCY ASSESSMENT
+Project: FoodHub Order Analysis
+Source file: data/raw/foodhub_order.csv
+Rows: 1,898 orders   |   Columns: 9   |   Grain: one row = one food order
+================================================================================
+
+--------------------------------------------------------------------------------
+PART A - DATA DICTIONARY
+--------------------------------------------------------------------------------
+Legend: type = storage/logical type; missing = count of null/placeholder values.
+
+1) order_id
+   Type      : Integer (identifier, not numeric measure)
+   Meaning   : Unique ID of the order.
+   Range     : 1,476,547 - 1,478,444; 1,898 unique values.
+   Missing   : 0. Duplicates: 0 (fully unique -> valid primary key).
+   Notes     : Sequential-looking IDs; treat as a label, never aggregate.
+
+2) customer_id
+   Type      : Integer (identifier)
+   Meaning   : ID of the customer who placed the order.
+   Range     : 1,200 unique customers across 1,898 orders.
+   Missing   : 0.
+   Notes     : 416 customers ordered more than once; busiest customer has 13
+               orders. Enables simple repeat-vs-one-time customer analysis, but
+               NOT time-based cohorts (no order date/time available).
+
+3) restaurant_name
+   Type      : Categorical (text)
+   Meaning   : Name of the restaurant fulfilling the order.
+   Cardinality: 178 unique restaurants.
+   Missing   : 0.
+   Notes     : Highly skewed. Top few: Shake Shack (219), The Meatball Shop
+               (132), Blue Ribbon Sushi (119). Long tail of restaurants with
+               very few orders -> watch for tiny-sample groups when aggregating.
+               Possible near-duplicate/variant names should be checked in
+               cleaning.
+
+4) cuisine_type
+   Type      : Categorical (text)
+   Meaning   : Cuisine the customer ordered.
+   Cardinality: 14 categories.
+   Distribution: American 584, Japanese 470, Italian 298, Chinese 215,
+               Mexican 77, Indian 73, Middle Eastern 49, Mediterranean 46,
+               Thai 19, French 18, Southern 17, Korean 13, Spanish 12,
+               Vietnamese 7.
+   Missing   : 0.
+   Notes     : Strongly imbalanced; small cuisines (<20 orders) are unreliable
+               on their own and may need grouping into an "Other" bucket.
+
+5) cost_of_the_order
+   Type      : Float (continuous, USD)
+   Meaning   : Gross cost/value of the order. (Data dictionary label: "cost".)
+   Range     : min 4.47, max 35.41, mean 16.50, median 14.14, std 7.48.
+               Quartiles: 12.08 / 14.14 / 22.30.
+   Missing   : 0.
+   Notes     : No zero/negative values -> plausible. Proxy for FoodHub revenue
+               (commission is a fixed but unspecified fraction of this).
+
+6) day_of_the_week
+   Type      : Categorical (binary text)
+   Meaning   : Whether the order was placed on a Weekday (Mon-Fri) or Weekend
+               (Sat-Sun).
+   Values    : Weekend 1,351 (71.2%), Weekday 547 (28.8%).
+   Missing   : 0.
+   Notes     : Only two levels. The exact day and time of day are NOT recorded,
+               so intra-week and hour-of-day patterns cannot be studied.
+
+7) rating
+   Type      : Categorical/ordinal stored as TEXT (mixed values)
+   Meaning   : Customer's rating of the order, out of 5.
+   Values    : "Not given" 736, "5" 588, "4" 386, "3" 188.
+   Missing   : 0 explicit nulls, BUT 736 rows (38.8%) are the placeholder
+               "Not given" = effectively missing ratings.
+   Notes     : IMPORTANT - stored as string because of "Not given"; must be
+               converted to numeric with "Not given" -> NaN before any math.
+               Observed scores are only 3, 4, 5 (no 1s or 2s present) -> ceiling/
+               selection effect. "Not given" is missing, NOT a low score.
+
+8) food_preparation_time
+   Type      : Integer (minutes)
+   Meaning   : Time taken by the restaurant to prepare the food (order
+               confirmation -> pick-up confirmation).
+   Range     : min 20, max 35, mean 27.4, median 27, std 4.6.
+   Missing   : 0.
+   Notes     : Narrow, plausible band; no obvious outliers.
+
+9) delivery_time
+   Type      : Integer (minutes)
+   Meaning   : Time taken by the delivery person to deliver (pick-up
+               confirmation -> drop-off).
+   Range     : min 15, max 33, mean 24.2, median 25, std 5.0.
+   Missing   : 0.
+   Notes     : Narrow, plausible band; no obvious outliers.
+
+Derived field to be engineered later:
+   total_fulfillment_time = food_preparation_time + delivery_time (minutes).
+
+Overall data-quality snapshot:
+   - No missing values in any column; no duplicate order_ids; no duplicate rows.
+   - The only real "missingness" is the 38.8% "Not given" ratings.
+   - Main cleaning tasks: cast rating to numeric (Not given -> NaN), sanity-check
+     restaurant-name variants, and optionally bucket rare cuisines/restaurants.
+
+--------------------------------------------------------------------------------
+PART B - CAN THIS DATA TEST OUR HYPOTHESES? (SUFFICIENCY ASSESSMENT)
+--------------------------------------------------------------------------------
+Hypothesis 1 - Weekend orders take longer to fulfill than weekday orders.
+   Needed    : total fulfillment time + weekday/weekend flag.
+   Available : YES - food_preparation_time + delivery_time, and day_of_the_week.
+   Verdict   : FULLY TESTABLE. Ample sample on both sides (1,351 vs 547).
+
+Hypothesis 2 - Faster fulfillment -> higher customer rating.
+   Needed    : total fulfillment time + rating.
+   Available : PARTIALLY - times are complete, but 38.8% of ratings are
+               "Not given" and must be dropped, leaving 1,162 rated orders.
+   Verdict   : TESTABLE on rated orders, with a caveat: results describe only
+               customers who chose to rate (potential response/selection bias).
+
+Hypothesis 3 - Demand & revenue are concentrated in a few restaurants/cuisines.
+   Needed    : orders + cost grouped by restaurant and cuisine.
+   Available : YES - restaurant_name, cuisine_type, cost_of_the_order all
+               complete.
+   Verdict   : FULLY TESTABLE (descriptive concentration / Pareto analysis).
+
+--------------------------------------------------------------------------------
+PART C - DATA GAPS (what is MISSING or LIMITING)
+--------------------------------------------------------------------------------
+G1. No order date/timestamp. Only a Weekday/Weekend flag exists -> cannot build
+    time-based customer cohorts, trends over time, seasonality, or hour-of-day
+    demand. (Limits any "cohort"/"first-month vs later-month" style analysis.)
+
+G2. No customer demographics or geography. No age, gender, device, city, or
+    delivery address/distance. -> cannot segment demand by demographics, and
+    cannot normalize delivery_time by distance. (Limits any demographic-
+    frequency analysis.)
+
+G3. High rating non-response. 38.8% "Not given" ratings; observed scores only
+    span 3-5. Satisfaction findings apply only to self-selected raters and may
+    overstate true satisfaction.
+
+G4. No basket detail. No item count / "items per order" and no discounts, taxes,
+    tips, or the actual commission rate. -> "average items per order" cannot be
+    computed, and revenue is only a proxy via cost_of_the_order.
+
+G5. No delivery operations context. No driver ID, distance, traffic/weather, or
+    restaurant capacity -> fulfillment-time differences can be described but not
+    fully explained (no root-cause attribution).
+
+G6. Category imbalance / small groups. Several cuisines (<20 orders) and many
+    restaurants (single-digit orders) are too small for stable per-group stats;
+    aggregate or flag them.
+
+--------------------------------------------------------------------------------
+PART D - IMPACT ON THE PLANNED ANALYSIS
+--------------------------------------------------------------------------------
+- All three defined hypotheses (H1-H3) CAN be meaningfully tested with this data;
+  H2 is qualified by rating non-response bias.
+- Gaps G1-G2 mean that any later prompts framed around time-based "cohorts" or
+  "demographic variables (city/age/gender/device)" cannot be answered as-is and
+  will be adapted to the equivalent questions this dataset can support
+  (e.g., repeat vs one-time customers instead of time cohorts; cuisine/restaurant
+  segments instead of demographic segments).
+- No external data is required to proceed; the gaps constrain scope and the
+  strength of conclusions but do not block the core analysis.
+================================================================================
