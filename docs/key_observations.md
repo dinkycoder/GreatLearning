@@ -10,12 +10,13 @@ confirmation follows in the hypothesis-testing step.*
 
 FoodHub's order book tells a story of **concentrated demand, uniform operations, and
 quietly positive — but poorly measured — satisfaction.** A handful of restaurants and
-two cuisines carry most of the business; the delivery machine runs at a remarkably
-consistent ~51-minute pace regardless of when, what, or how much is ordered; and
-customers who bother to rate are happy, but nearly four in ten never rate at all. The
-levers that *look* like they should matter for satisfaction and loyalty — speed, day of
-week, basket size — barely move the needle in this data. What matters is **who you
-order from and how often you come back**, not how fast or how much.
+two cuisines carry most of the business; the delivery machine runs at a steady ~51-min
+average that barely varies with *what* or *how much* is ordered — though it is
+**meaningfully faster on weekends** (lighter traffic); and customers who bother to rate
+are happy, but nearly four in ten never rate at all. The lever that *looks* like it
+should matter for satisfaction — delivery speed — **does not move ratings at all**.
+What matters for the business is **who you order from and how often you come back**,
+not how fast or how much.
 
 ---
 
@@ -44,24 +45,30 @@ and Japanese win because more people order them, not because those orders are bi
 
 ---
 
-## 2. The operations picture — impressively, almost suspiciously, uniform
+## 2. The operations picture — stable, and faster on weekends
 
 The end-to-end wait — **total fulfillment time = preparation + delivery** — averages
-**~51.5 minutes** (prep ~27 min, delivery ~24 min), and its most notable feature is how
-*little it varies with anything*:
+**~51.5 minutes** (prep ~27 min, delivery ~24 min). It is stable across cuisines and
+order sizes, but it is **not** flat across the week — weekends are notably faster:
 
-- **Weekends are not slower.** Despite weekends carrying ~71% of all orders
-  (2.5× weekday volume), weekend and weekday fulfillment times are nearly identical
-  (~51–52 min). The bivariate boxplots and the multivariate cuisine-by-day view agree:
-  there is **no cuisine and no day where fulfillment clearly slows down.**
+- **Weekends are actually *faster*, not slower.** Despite weekends carrying ~71% of
+  all orders (2.5× weekday volume), weekend fulfillment averages **~49.9 min vs ~55.5
+  min on weekdays** — a **~5.6-minute advantage** confirmed as highly significant in the
+  formal testing step (large effect, Cohen's d ≈ 0.89). The gap is driven **entirely by
+  delivery time** (weekday 28.3 vs weekend 22.5 min; preparation is identical at ~27
+  min), most plausibly reflecting **lighter weekend road traffic**. *(An earlier
+  visual reading here mistakenly called the two "nearly identical"; the statistical
+  test corrected it.)*
 - **Cost and time are unrelated.** Bigger orders are not slower orders.
 - **The correlation heatmap confirms it:** aside from the mechanical link between prep,
   delivery, and their sum, every numeric measure is essentially **uncorrelated** with
   every other. The operation behaves like a well-buffered, capacity-managed system.
 
-> **Business meaning:** Operational performance is stable and does not degrade under
-> weekend load — a genuine strength. It also means "speed" is unlikely to be the lever
-> that differentiates good and bad experiences here.
+> **Business meaning:** Operations scale *well* under weekend load — weekends are the
+> fast days, not the bottleneck. The real efficiency target is the slower **weekday**
+> delivery leg (a likely traffic problem). And because time barely varies with cost or
+> rating, "speed" is unlikely to be the lever that differentiates good and bad
+> *experiences* here.
 
 ---
 
@@ -110,13 +117,14 @@ With no time axis available, "retention" was examined through its nearest proxy 
 
 | Hypothesis | What the visuals suggest | Confidence |
 |---|---|---|
-| **H1** — Weekend orders take longer to fulfill | Times are ~equal on weekends and weekdays | Looks **weak / likely null** |
-| **H2** — Faster fulfillment → higher rating | Rating flat across speed tiers, even conditioned | Looks **weak / likely null** |
-| **H3** — Demand & revenue concentrated in few restaurants/cuisines | Clear Pareto concentration; volume drives revenue | Looks **strong / likely supported** |
+| **H1** — Weekend orders take longer to fulfill | Weekends are ~5.6 min **faster**, not slower (delivery-driven) | **Rejected** (opposite, significant) |
+| **H2** — Faster fulfillment → higher rating | Rating flat across speed tiers, even conditioned | **Not supported** (ρ≈0) |
+| **H3** — Demand & revenue concentrated in few restaurants/cuisines | Clear Pareto concentration; volume drives revenue | **Supported** |
 
-The exploratory evidence points to a clean split: the two *operational-experience*
-hypotheses (H1, H2) appear weak, while the *market-structure* hypothesis (H3) appears
-robust. The formal statistical tests will confirm or refute H1 and H2.
+The formal tests (see `notebooks/04_hypothesis_testing.ipynb`) gave a clear verdict:
+**H1 is rejected — and in the opposite direction** (weekends are significantly faster,
+via delivery time); **H2 shows no association** between speed and rating; and **H3's
+concentration is strongly supported** (Gini 0.71, χ² p≈0).
 
 ---
 
