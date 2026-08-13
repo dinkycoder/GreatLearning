@@ -10,7 +10,8 @@ subfolder inside its course. Every project is self-contained (its own data, note
 
 | # | Course | Project | Status |
 |---|--------|---------|--------|
-| 01 | Python Foundations | [Project 1 — FoodHub EDA](01-python-foundations/project-1-foodhub-eda/) | In progress |
+| 01 | AI-Assisted Coding and Data Analysis | [Project 1 — FoodHub EDA](Course01-AI-assisted-coding-and-data-analysis/project-1-foodhub-eda/) | In progress |
+| 02 | Machine Learning | _none yet_ | Not started |
 
 ## Structure
 
@@ -18,7 +19,7 @@ subfolder inside its course. Every project is self-contained (its own data, note
 mit-applied-ai-and-data-science/
 ├── README.md                          # this index
 ├── .gitignore                         # shared ignores (venvs, data-secrets, .claude)
-└── NN-course-name/
+└── CourseNN-course-name/
     └── project-N-name/
         ├── data/        raw & processed datasets
         ├── notebooks/   analysis notebooks
@@ -30,5 +31,5 @@ mit-applied-ai-and-data-science/
 ## Conventions
 
 - **One virtual environment per project** to avoid library-version conflicts across courses.
-- Prefix course folders with a two-digit number (`01-`, `02-`, …) to keep ordering.
+- Prefix course folders with `Course` + two digits (`Course01-`, `Course02-`, …) to keep ordering.
 - Keep each project's `README.md` describing its goal, data source, and how to run it.
