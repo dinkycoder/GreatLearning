@@ -1,29 +1,34 @@
-# EDA Project
+# MIT Applied AI and Data Science — Great Learning
 
-Exploratory Data Analysis project.
+Coursework, projects, and notes for the MIT Applied AI & Data Science program (via Great Learning).
+Program catalog: https://olympus.mygreatlearning.com/courses?pb_id=19855
 
-## Directory Structure
+This is a single umbrella repository. Each course gets a numbered folder; each project gets its own
+subfolder inside its course. Every project is self-contained (its own data, notebooks, source, and reports).
+
+## Courses & Projects
+
+| # | Course | Project | Status |
+|---|--------|---------|--------|
+| 01 | Python Foundations | [Project 1 — FoodHub EDA](01-python-foundations/project-1-foodhub-eda/) | In progress |
+
+## Structure
 
 ```
-.
-├── data/
-│   ├── raw/          # Original, immutable source datasets (place inputs here)
-│   └── processed/    # Cleaned / feature-engineered analytical datasets
-├── notebooks/        # Jupyter notebooks for analysis
-│   ├── 01_univariate_analysis.ipynb
-│   ├── 02_bivariate_analysis.ipynb
-│   └── 03_multivariate_analysis.ipynb
-├── reports/          # Generated outputs (HTML report, figures)
-├── docs/             # Problem definition, data dictionary, notes
-└── README.md
+mit-applied-ai-and-data-science/
+├── README.md                          # this index
+├── .gitignore                         # shared ignores (venvs, data-secrets, .claude)
+└── NN-course-name/
+    └── project-N-name/
+        ├── data/        raw & processed datasets
+        ├── notebooks/   analysis notebooks
+        ├── src/         reusable scripts
+        ├── reports/     rendered outputs (HTML, etc.)
+        └── docs/        problem statement, notes
 ```
 
-## Workflow
+## Conventions
 
-1. Define the problem, KPIs, and hypotheses (`docs/`)
-2. Profile the raw data and build a data dictionary (`docs/`)
-3. Construct the analytical dataset (`data/processed/`)
-4. Clean and align the data
-5. Univariate → bivariate → multivariate analysis (`notebooks/`)
-6. Hypothesis testing
-7. Synthesize insights into a final report (`reports/`)
+- **One virtual environment per project** to avoid library-version conflicts across courses.
+- Prefix course folders with a two-digit number (`01-`, `02-`, …) to keep ordering.
+- Keep each project's `README.md` describing its goal, data source, and how to run it.
